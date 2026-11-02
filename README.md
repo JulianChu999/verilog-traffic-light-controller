@@ -1,28 +1,13 @@
-# Verilog Traffic Light Controller (TLC)
-
-這是一個基於 FSM (Finite State Machine) 實作的智慧型交通號誌控制器，使用 Verilog HDL 開發，專為 FPGA 原型設計所打造，並透過 ModelSim 進行功能驗證（Functional Simulation）。
-
-## 📌 專案概述 (Project Overview)
-本專案實作了一個可管理主幹道與支線（包含左轉專用時相）的交通號誌控制器。專案採用 **Top-Down 模組化設計方法**，將控制器狀態機與計時管理邏輯清楚分離。
-
-## 🧱 系統架構 (System Architecture)
-系統主要由兩個核心模組整合至 Top-level 設計中：
-1. **`TLC` (Finite State Machine / 狀態機)**：
-   - 管理 6 個不同的運作狀態（$S0 \sim S5$）。
-   - 根據計時器閥值（`TL`, `TS`, `T_TR`）產生主幹道與支線的控制信號（包含綠燈 `HG`/`FG`、黃燈 `HY`/`FY`、紅燈 `HR`/`FR` 與左轉保護燈號）。
-2. **`counter` (計時器模組)**：
-   - 由狀態輸出（`ST_out`）驅動的動態計時器。
-   - 產生清除旗標（`timer_clr`）與時間到脈衝，以精確驅動狀態轉移邏輯。
-
-## 🛠️ 開發與驗證環境 (Development & Verification Environment)
-- **綜合與實現 (Synthesis & Implementation)**：Intel Quartus 13.1（目標晶片：Cyclone IV E）
-- **功能驗證 (Functional Verification)**：ModelSim-Altera Starter Edition
-- **模擬驗證 (Simulation Validation)**：透過完整的 RTL simulation testbench (`tb_traffic_light.v`) 進行驗證。
-
-## 📊 模擬結果 (Simulation Results)
-Testbench 提供 20ns 的時脈週期（Clock Cycle）與非同步重置（Asynchronous Reset）控制。功能驗證確認所有狀態皆能循序切換，且輸出信號（如 `HG`, `HY`, `HR`, `FG`, `FY`, `FR`）皆能依照時序規格正確切換。
-
-## 🚀 快速開始 (Getting Started)
-1. Clone 本專案並在 **Quartus 13.1** 中開啟專案。
-2. 執行 Analysis & Synthesis 以確保程式碼順利完成編譯。
-3. 使用 ModelSim 載入 `tb_traffic_light.v` 並執行模擬腳本，即可觀察完整的波形行為。
+Verilog-Based Intelligent Traffic Light Controller (TLC) Design & FPGA Verification本專案基於 Verilog HDL 開發一套智慧型雙向交通號誌控制器（Traffic Light Controller, TLC），具備主幹道/支線動態計時機制與左轉保護時相（Left-Turn Phase）。整體架構採用 Top-Down 階層式模組化設計，結合有限狀態機（FSM）與動態計數器模組（counter），並已在 Intel Quartus 13.1 與 ModelSim-Altera 開發環境下完成完整邏輯合成與 RTL 時序模擬驗證。📌 系統核心規格與特點硬體描述語言：Verilog HDL (2001 Standard)核心架構：Top-Down 階層化模組化設計 (Top module TLC + Sub-module counter)狀態機架構：6-State Finite State Machine ($S_0 \sim S_5$)時相功能：支援主幹道與支線之紅、黃、綠燈號，以及獨特的左轉保護時相 (HRTR / FRTR)EDA 開發工具：Intel Quartus 13.1 Web Edition模擬驗證工具：ModelSim-Altera Starter Edition 10.1d目標晶片：Intel Cyclone IV E (EP4CE6F17C8 / 同級目標元件)🧱 系統架構圖 (System Architecture)頂層模組 TLC 負責整體 FSM 狀態跳轉與燈號控制，內嵌子模組 counter 進行動態計時。兩者透過 ST_out（狀態代碼）與 TL / TS / T_TR（計數到期旗標）進行同步對接。🔄 FSM 狀態規劃與時相定義控制器規劃了 6 個穩定狀態（$S_0 \sim S_5$），精準分配各幹道的通行秒數：狀態對應號誌狀態停留條件與時脈數輸出燈號特徵S0主幹道直行綠燈達 6 個時脈週期 ($TL=1$)$HG=1, FR=1$ (其餘為 0)S1主幹道黃燈達 4 個時脈週期 ($TS=1$)$HY=1, FR=1$S2主幹道紅燈＋左轉保護達 3 個時脈週期 ($T\_TR=1$)$HRTR=1, FR=1$S3支線直行綠燈達 6 個時脈週期 ($TL=1$)$HR=1, FG=1$S4支線黃燈達 4 個時脈週期 ($TS=1$)$HR=1, FY=1$S5支線紅燈＋左轉保護達 3 個時脈週期 ($T\_TR=1$)$HR=1, FRTR=1$⚙️ Quartus 邏輯合成與資源評估透過 Quartus 13.1 的 Analysis & Synthesis 與 TimeQuest Timing Analyzer 針對 Cyclone IV E 晶片進行硬體資源評估與時序分析：Logic Utilization：使用的 Logic Elements (LEs) 僅佔晶片總容量的 < 2%，顯示極高的邏輯資源效率。Registers：狀態與計數暫存器資源開銷極低。TimeQuest Timing：在 50MHz / 100MHz 系統時脈下，Setup/Hold Slack 均為正值（MET），無任何時序違規 (Timing Violation)。📊 ModelSim 模擬與功能驗證透過 tb_traffic_light.v 測試平台進行 RTL 級功能驗證，系統時脈週期設為 20ns，並於 12ns 時釋放 reset：完整狀態切換：狀態機由 $S_0$ 正確依序經過 $S_1 \to S_2 \to S_3 \to S_4 \to S_5 \to S_0$ 進行大循環。無 Glitch 輸出：各個號誌燈號切換反應迅速且波形無異常雜訊。📁 檔案結構說明verilog-traffic-light-controller/
+├── rtl/
+│   ├── TLC.v              # 頂層 Verilog 控制模組 (FSM)
+│   └── counter.v          # 內部計數器子模組
+├── testbench/
+│   └── tb_traffic_light.v # ModelSim 測試平台
+├── docs/
+│   ├── block_diagram.png  # 系統架構方塊圖
+│   ├── fsm_diagram.png    # FSM 狀態轉移圖
+│   └── waveform.png       # ModelSim 模擬波形截圖
+├── TLC.qpf                 # Quartus 專案檔
+└── README.md              # 專案說明文件
+🚀 快速開始 / 如何執行模擬使用 Quartus NativeLink 自動模擬：開啟 Quartus 13.1 並開啟專案檔 TLC.qpf。點選選單 Tools -> Options -> EDA Tool Locations，確認 ModelSim-Altera 路徑已設為你的 win32aloem 資料夾。點選 Tools -> Run Simulation Tool -> RTL Simulation 即可自動啟動 ModelSim 並載入波形。📝 授權條款本项目採用 MIT License 授權。

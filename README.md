@@ -71,3 +71,15 @@ verilog-traffic-light-controller/
 │   └── waveform.png       # ModelSim 模擬波形截圖
 ├── TLC.qpf                # Quartus 專案檔
 └── README.md              # 專案說明文件
+
+🚀 快速開始 / 如何執行模擬
+使用 Quartus NativeLink 自動模擬：
+
+開啟 Quartus 13.1 並開啟專案檔 TLC.qpf。
+
+點選選單 Tools -> Options -> EDA Tool Locations，確認 ModelSim-Altera 路徑已設為你的 win32aloem 資料夾。
+
+點選 Tools -> Run Simulation Tool -> RTL Simulation 即可自動啟動 ModelSim 並載入波形。
+
+📄 授權條款
+本專案採用 MIT License 授權。

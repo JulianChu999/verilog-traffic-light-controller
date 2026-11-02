@@ -71,6 +71,8 @@ verilog-traffic-light-controller/
 │   └── waveform.png       # ModelSim 模擬波形截圖
 ├── TLC.qpf                # Quartus 專案檔
 └── README.md              # 專案說明文件
+```
+---
 
 ## 🚀 快速開始 / 如何執行模擬
 
